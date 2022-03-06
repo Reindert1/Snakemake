@@ -1,0 +1,13 @@
+1:
+All the data in this directory is stored in a yaml file, this is found on the top of the existing file. In configfile: config.yaml.
+This has a key: value structure and all the elements can be requested and processed. Same goes for the working directory configuration:
+Using this structure gives clean and readable code. No datapaths need to be modified when cloned, just a config file needs to be made.
+
+2:
+There are not many in-line comments, but the output of the pipeline has a lot of comments. There are many things like (...).done or "plotting summary"
+This is a nice way to do it, since the user knows exactly what is running and where possible errors can occur.
+
+3:
+there is an SQL password in the code
+What i would improve is the readability of the code, there are almost no comments. Only the database function has comments, not what is going in or out
+and the code is running. This could be improved.

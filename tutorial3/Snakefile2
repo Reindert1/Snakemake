@@ -1,0 +1,14 @@
+import os
+
+url = "https://bioinf.nl/~fennaf/snakemake/test.txt"
+
+# Assignment 1
+rule all:
+    input:
+       "test.txt"
+
+rule download:
+    output:
+       "test.txt"
+    shell:
+        "wget {url}"
