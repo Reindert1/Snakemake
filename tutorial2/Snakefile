@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # -*- python -*-
 from os.path import join
 
@@ -11,13 +13,14 @@ rule all:
 rule bwa_map:
     input:
         join(FDIR, "genome.fa"),
-        # "data/genome.fa",
         "data/samples/{sample}.fastq"
     output:
         "mapped_reads/{sample}.bam"
-    message: "executing bwa mem on the following {input} to generate the following {output}..."
+    benchmark:
+        "benchmarks/{sample}.bwa.benchmark.txt"
+    threads: 8
     shell:
-        "bwa mem {input} | samtools view -Sb - > {output}"
+        "bwa mem -t {threads} {input} | samtools view -Sb - > {output}"
 
 rule samtools_sort:
     input:
@@ -28,7 +31,7 @@ rule samtools_sort:
     shell:
         "samtools sort -T sorted_reads/{wildcards.sample} "
         "-O bam {input} > {output}"
-        
+
 rule samtools_index:
     input:
         "sorted_reads/{sample}.bam"
@@ -41,8 +44,8 @@ rule samtools_index:
 rule bcftools_call:
     input:
         fa="data/genome.fa",
-        bam=expand("sorted_reads/{sample}.bam", sample=SAMPLES),
-        bai=expand("sorted_reads/{sample}.bam.bai", sample=SAMPLES)
+        bam=expand("sorted_reads/{sample}.bam",sample=SAMPLES),
+        bai=expand("sorted_reads/{sample}.bam.bai",sample=SAMPLES)
     output:
         "calls/all.vcf"
     message: "Executing bcftools_call..."
@@ -59,6 +62,7 @@ rule report:
     message: "Generating a report..."
     run:
         from snakemake.utils import report
+
         with open(input[0]) as f:
             n_calls = sum(1 for line in f if not line.startswith("#"))
 
@@ -71,4 +75,5 @@ rule report:
         SAMtools/BCFtools.
 
         This resulted in {n_calls} variants (see Table T1_).
-        """, output[0], metadata="Author: Mr Pipeline", T1=input[0])
+        """,output[0],metadata="Author: Mr Pipeline",T1=input[0])
+
